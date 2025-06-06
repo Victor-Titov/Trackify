@@ -7,6 +7,7 @@ db = SQLAlchemy()
 class Habit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
+    email = db.Column(db.String(50))
     time = db.Column(db.Time)
     desc = db.Column(db.Text)
 
@@ -18,4 +19,3 @@ class Person(db.Model):
 
     habits = db.relationship('Habit', backref='person', lazy=True)
 
-    
