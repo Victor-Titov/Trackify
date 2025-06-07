@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from ..models import db, Person
-from datetime import datetime
+
 
 person_bp = Blueprint('person_bp', __name__, url_prefix='/people/')
 
@@ -38,10 +38,19 @@ def getPeople():
         people = Person.query.all()
         result = []
         for person in people:
+            habits=[]
+            for habit in person.habits:
+                habits.append({
+                    'id': habit.id,
+                    'name': habit.name,
+                    'time': str(habit.time),
+                    'description': habit.desc
+                })
             result.append({
                 'id': person.id,
                 'name': person.name,
-                'email': person.email
+                'email': person.email,
+                'habits': habits
             })
 
         return jsonify({
@@ -56,12 +65,21 @@ def getPeople():
 def getPerson(person_id):
     try:
         person = Person.query.get_or_404(person_id)
+        habits = []
+        for habit in person.habits:
+                habits.append({
+                    'id': habit.id,
+                    'name': habit.name,
+                    'time': str(habit.time),
+                    'description': habit.desc
+                })
         return jsonify({
             'status': 200,
             'person': {
                 'id': person.id,
                 'name': person.name,
-                'email': person.email
+                'email': person.email,
+                'habits': habits
             }
         }), 200
 
