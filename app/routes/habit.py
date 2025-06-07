@@ -70,3 +70,36 @@ def getHabits():
 
     except Exception as e:
         return jsonify({'status': 500, 'error': str(e)}), 500
+    
+@habit_bp.route('/<int:habit_id>', methods=["GET"])
+def getHabit(habit_id):
+    try:
+        habit = Habit.query.get_or_404(habit_id)
+        return jsonify({
+            'status': 200,
+            'habit': {
+                'id': habit.id,
+                'name': habit.name,
+                'time': time.isoformat(habit.time),
+                'description': habit.desc,
+                'person_id': habit.person_id
+            }
+        }), 200
+
+    except Exception as e:
+        return jsonify({'status': 500, 'error': str(e)}), 500
+    
+@habit_bp.route('/<int:habit_id>', methods=["DELETE"])
+def deleteHabit(habit_id):
+    try:
+        habit = Habit.query.get_or_404(habit_id)
+        db.session.delete(habit)
+        db.session.commit()
+
+        return jsonify({
+            'status': 200,
+            'message': 'Habit deleted successfully'
+        }), 200
+
+    except Exception as e:
+        return jsonify({'status': 500, 'error': str(e)}), 500
