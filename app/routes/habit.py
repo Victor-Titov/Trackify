@@ -103,3 +103,33 @@ def deleteHabit(habit_id):
 
     except Exception as e:
         return jsonify({'status': 500, 'error': str(e)}), 500
+    
+
+@habit_bp.route('/<int:habit_id>', methods=["PATCH"])
+def updateHabit(habit_id):
+    try:
+        data = request.get_json()
+        habit = Habit.query.get_or_404(habit_id)
+
+        name = data.get('name')
+        time_iso = data.get('time')
+        description = data.get('description')
+
+        if name:
+            habit.name = name
+        if time_iso:
+            dtime = time.fromisoformat(time_iso)
+            habit.time = dtime
+        if description:
+            habit.desc = description
+
+        db.session.commit()
+
+        return jsonify({
+            'status': 200,
+            'message': 'Habit updated successfully',
+            'habit_id': habit.id
+        }), 200
+
+    except Exception as e:
+        return jsonify({'status': 500, 'error': str(e)}), 500
