@@ -14,7 +14,7 @@ class Habit(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     current_streak = db.Column(db.Integer, default=0)
     longest_streak = db.Column(db.Integer, default=0)
-
+    done_today = db.Column(db.Boolean, default=False)
 
 class Person(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -61,7 +61,10 @@ def getHabits():
                 'time': time.isoformat(habit.time),
                 'description': habit.desc,
                 'person_id': habit.person_id,
-                'Created At': habit.created_at.isoformat()
+                'Created At': habit.created_at.isoformat(),
+                'current_streak': habit.current_streak,
+                'longest_streak': habit.longest_streak,
+                'done_today': habit.done_today
             })
 
         return jsonify({
@@ -83,7 +86,11 @@ def getHabit(habit_id):
                 'name': habit.name,
                 'time': time.isoformat(habit.time),
                 'description': habit.desc,
-                'person_id': habit.person_id
+                'person_id': habit.person_id,
+                'created_at': habit.created_at.isoformat(),
+                'current_streak': habit.current_streak,
+                'longest_streak': habit.longest_streak,
+                'done_today': habit.done_today
             }
         }), 200
 
@@ -141,10 +148,15 @@ def updateHabit(habit_id):
 def increaseHabitStreak(habit_id):
     try:
         habit = Habit.query.get_or_404(habit_id)
-
+        if habit.done_today:
+            return jsonify({
+                'status': 400,
+                'message': 'Habit already marked as done today'
+            }), 400
         person = Person.query.get_or_404(habit.person_id)
         person.habits_completed_today += 1
         habit.current_streak += 1
+        habit.done_today = True
         if habit.current_streak > habit.longest_streak:
             habit.longest_streak = habit.current_streak
         db.session.commit()
@@ -176,3 +188,5 @@ def resetHabitStreak(habit_id):
 
     except Exception as e:
         return jsonify({'status': 500, 'error': str(e)}), 500
+    
+    
