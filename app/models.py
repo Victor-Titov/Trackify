@@ -16,11 +16,25 @@ class Habit(db.Model):
     longest_streak = db.Column(db.Integer, default=0)
     done_today = db.Column(db.Boolean, default=False)
 
+
+person_leaderboard = db.Table(
+    'person_leaderboard',
+    db.Column('person_id', db.Integer, db.ForeignKey('person.id'), primary_key=True),
+    db.Column('leaderboard_id', db.Integer, db.ForeignKey('leaderboard.id'), primary_key=True)
+)
+
+
 class Person(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    email = db.Column(db.String(50))
+    name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(50), nullable=False)
     habits = db.relationship('Habit', backref='person', lazy=True)
     habits_completed_today = db.Column(db.Integer, default=0)
+    
+    leaderboards = db.relationship('Leaderboard', secondary=person_leaderboard, backref=db.backref('participants', lazy='dynamic'),lazy='dynamic')
 
 
+class Leaderboard(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    last_updated = db.Column(db.DateTime, default=db.func.current_timestamp())

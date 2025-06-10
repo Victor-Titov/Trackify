@@ -51,7 +51,8 @@ def getPeople():
                 'name': person.name,
                 'email': person.email,
                 'habits': habits,
-                'habits_done_today': person.habits_done_today
+                'habits_completed_today': person.habits_completed_today,
+                'leaderboards': [{'id': lb.id, 'name': lb.name} for lb in person.leaderboards.all()]
             })
 
         return jsonify({
@@ -81,7 +82,8 @@ def getPerson(person_id):
                 'name': person.name,
                 'email': person.email,
                 'habits': habits,
-                'habits_done_today': person.habits_done_today
+                'habits_completed_today': person.habits_completed_today,
+                'leaderboards': [{'id': lb.id, 'name': lb.name} for lb in person.leaderboards.all()]
             }
         }), 200
 
@@ -137,7 +139,7 @@ def endDay(person_id):
     try:
         person = Person.query.get_or_404(person_id)
 
-        person.habits_done_today = 0
+        person.habits_completed_today = 0
         for habit in person.habits:
             if habit.done_today:
                 
