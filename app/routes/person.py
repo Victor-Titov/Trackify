@@ -50,7 +50,8 @@ def getPeople():
                 'id': person.id,
                 'name': person.name,
                 'email': person.email,
-                'habits': habits
+                'habits': habits,
+                'habits_completed_today': person.habits_completed_today
             })
 
         return jsonify({
@@ -79,7 +80,8 @@ def getPerson(person_id):
                 'id': person.id,
                 'name': person.name,
                 'email': person.email,
-                'habits': habits
+                'habits': habits,
+                'habits_completed_today': person.habits_completed_today
             }
         }), 200
 
@@ -124,6 +126,24 @@ def updatePerson(person_id):
                 'name': person.name,
                 'email': person.email
             }
+        }), 200
+
+    except Exception as e:
+        return jsonify({'status': 500, 'error': str(e)}), 500
+    
+
+@person_bp.route('/<int:person_id>/endDay', methods=["GET"])
+def endDay(person_id):
+    try:
+        person = Person.query.get_or_404(person_id)
+
+        person.habits_completed_today = 0
+        db.session.commit()
+
+        return jsonify({
+            'status': 200,
+            'message': 'Day ended successfully',
+            'person_id': person.id
         }), 200
 
     except Exception as e:

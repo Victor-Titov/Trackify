@@ -137,10 +137,13 @@ def updateHabit(habit_id):
     except Exception as e:
         return jsonify({'status': 500, 'error': str(e)}), 500
     
-@habit_bp.route('/<int:habit_id>/IncreasStreak', methods=["PATCH"])
+@habit_bp.route('/<int:habit_id>/Do', methods=["PATCH"])
 def increaseHabitStreak(habit_id):
     try:
         habit = Habit.query.get_or_404(habit_id)
+
+        person = Person.query.get_or_404(habit.person_id)
+        person.habits_completed_today += 1
         habit.current_streak += 1
         if habit.current_streak > habit.longest_streak:
             habit.longest_streak = habit.current_streak

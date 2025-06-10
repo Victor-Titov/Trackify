@@ -21,4 +21,6 @@ class Person(db.Model):
     name = db.Column(db.String(50))
     email = db.Column(db.String(50))
     habits = db.relationship('Habit', backref='person', lazy=True)
+    habits_completed_today = db.Column(db.Integer, default=0)
+
 
