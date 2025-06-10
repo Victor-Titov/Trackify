@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from ..models import db, Habit, Person
-from datetime import time, datetime
+from ..models import db, Habit, Person, HabitCompletion
+from datetime import time, datetime, date
 habit_bp = Blueprint('habit_bp', __name__, url_prefix='/habits/')
 
 @habit_bp.route('', methods=["POST"])
@@ -159,6 +159,10 @@ def increaseHabitStreak(habit_id):
         habit.done_today = True
         if habit.current_streak > habit.longest_streak:
             habit.longest_streak = habit.current_streak
+
+        today = date.today()
+        completion = HabitCompletion(habit_id=habit.id, date=today, completed=True)
+        db.session.add(completion)
         db.session.commit()
 
         return jsonify({
@@ -189,4 +193,13 @@ def resetHabitStreak(habit_id):
     except Exception as e:
         return jsonify({'status': 500, 'error': str(e)}), 500
     
+
+@habit_bp.route('/<int:habit_id>/history', methods=["GET"])
+def getHabitHistory(habit_id):
+    completions = HabitCompletion.query.filter_by(habit_id=habit_id).order_by(HabitCompletion.date.desc()).all()
+    return jsonify([{
+        'date': c.date.isoformat(),
+        'completed': c.completed
+    } for c in completions])
+
     

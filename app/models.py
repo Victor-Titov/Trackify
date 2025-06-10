@@ -15,6 +15,7 @@ class Habit(db.Model):
     current_streak = db.Column(db.Integer, default=0)
     longest_streak = db.Column(db.Integer, default=0)
     done_today = db.Column(db.Boolean, default=False)
+    completion_history = db.relationship('HabitCompletion', back_populates='habit', lazy=True, cascade='all, delete-orphan')
 
 
 person_leaderboard = db.Table(
@@ -38,3 +39,12 @@ class Leaderboard(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     last_updated = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+
+class HabitCompletion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    habit_id = db.Column(db.Integer, db.ForeignKey('habit.id'), nullable=False)
+    date = db.Column(db.Date, default=db.func.current_date())
+    completed = db.Column(db.Boolean, default=True)
+
+    habit = db.relationship('Habit', back_populates='completion_history')
